@@ -86,11 +86,11 @@ def atualizar_tarefa(id_tarefa, **campos):
     Atualiza os campos de uma tarefa.
     Campos permitidos: titulo, descricao, prioridade, status, responsavel
     """
-    campos_permitidos = ['titulo', 'descricao', 'prioridade', 'status', 'responsavel']
+    campos_permitidos = {'titulo', 'descricao', 'prioridade', 'status', 'responsavel'}
     status_validas = ["a_fazer", "em_andamento", "concluida"]
     prioridades_validas = ['alta', 'media', 'baixa']
 
-    campos_invalidos = set(campos.keys()) - campsos_permitidos
+    campos_invalidos = set(campos.keys()) - campos_permitidos
     if campos_invalidos:
         raise ValueError(f"Campos inválidos: {campos_invalidos}. Campos permitidos: {campos_permitidos}")
 
@@ -108,7 +108,7 @@ def atualizar_tarefa(id_tarefa, **campos):
             tarefa["data_atualizacao"] = datetime.now().isoformat()
             salvar_tarefas(tarefas)
             return tarefa
-        return None
+    return None
 
 # --- DELETAR TAREFA ---
 def deletar_tarefa(id_tarefa):
