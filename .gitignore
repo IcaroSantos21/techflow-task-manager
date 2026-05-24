@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*.json
+.pytest_cache
+.coverage
+*.egg-info/
+dist/
+node_modules/
