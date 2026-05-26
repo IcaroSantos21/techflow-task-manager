@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   testes:
@@ -15,10 +16,10 @@ jobs:
       - name: Checkout do repositorio
         uses: actions/checkout@v3
 
-      - name: Configurar Python 3.11
+      - name: Configurar Python 3.14
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.14"
 
       - name: Instalar dependencias
         run: |
