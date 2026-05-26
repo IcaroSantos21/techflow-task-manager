@@ -122,3 +122,37 @@ def deletar_tarefa(id_tarefa):
         return False  # tarefa não encontrada
     salvar_tarefas(novas_tarefas)
     return True
+
+# --- RELATÓRIOS DE PRODUTIVIDADE (MUDANÇA DE ESCOPO) ---
+def gerar_relatorio_produtividade():
+    """
+    Gera relatório de produtividade da equipe.
+    Feature adicionada após mudança de escopo solicitada pelo cliente.
+    que precisava monitorar o desempenho da equipe.
+    """
+    tarefas = carregar_tarefas()
+    total = len(tarefas)
+
+    if total == 0:
+        return {"total": 0, "mensagem": "Nenhuma tarefa cadastrada."}
+
+    por_status = {
+        "a_fazer": len([t for t in tarefas if t['status'] == 'a_fazer']),
+        "em_andamento": len([t for t in tarefas if t['status'] == 'em_andamento']),
+        "concluida": len([t for t in tarefas if t['status'] == 'concluida'])
+    }
+
+    por_prioridade = {
+        "alta": len([t for t in tarefas if t['prioridade'] == 'alta']),
+        "media": len([t for t in tarefas if t['prioridade'] == 'media']),
+        "baixa": len([t for t in tarefas if t['prioridade'] == 'baixa'])
+    }
+
+    taxa_conclusao = round((por_status['concluida'] / total) * 100, 1)
+
+    return {
+        "total": total,
+        "por_status": por_status,
+        "por_prioridade": por_prioridade,
+        "taxa_conclusao": taxa_conclusao
+    }

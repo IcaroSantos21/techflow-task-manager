@@ -119,3 +119,19 @@ class TestDeletarTarefa:
         restantes = task_manager.listar_tarefas()
         assert len(restantes) == 1
         assert restantes[0]["id"] == t2["id"]
+
+class TestGerarRelatorio:
+    def test_relatorio_sem_tarefas(self):
+        relatorio = task_manager.gerar_relatorio_produtividade()
+        assert relatorio["total"] == 0
+
+    def test_relatorio_taxa_conclusao(self):
+        t1 = task_manager.criar_tarefa("Tarefa 1", "Descrição 1")
+        t2 = task_manager.criar_tarefa("Tarefa 2", "Descrição 2")
+        task_manager.atualizar_tarefa(t1["id"], status="concluida")
+        relatorio = task_manager.gerar_relatorio_produtividade()
+        assert relatorio["total"] == 2
+        assert relatorio["taxa_conclusao"] == 50.0
+        assert relatorio["por_status"]["concluida"] == 1
+
+    
