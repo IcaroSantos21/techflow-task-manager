@@ -6,3 +6,4 @@ Projeto da Disciplina de Engenharia de Software - Unifecaf
 
 ## Status
 🚧 Em desenvolvimento
+# Triggering CI
