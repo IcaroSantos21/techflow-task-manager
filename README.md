@@ -22,6 +22,26 @@ Projeto da disciplina de **Engenharia de Software** — UniFECAF.
 
 ---
 
+## Mudança de Escopo
+
+**Quando:** Sprint 2
+
+**O que mudou:** Adição da funcionalidade de Relatório de Produtividade.
+
+**Justificativa:** Durante a revisão com o cliente, identificou-se a necessidade
+de monitorar o desempenho da equipe com dados quantitativos para apresentação
+em reuniões semanais de gestão. O cliente solicitou um relatório que mostrasse:
+
+- Total de tarefas cadastradas
+- Distribuição por status (A Fazer, Em Andamento, Concluída)
+- Distribuição por prioridade (Alta, Média, Baixa)
+- Taxa de conclusão percentual do projeto
+
+**Impacto:** A função `gerar_relatorio()` foi adicionada ao `task_manager.py`
+com testes automatizados. O Kanban foi atualizado com o novo card.
+
+---
+
 ## Metodologia Ágil
 
 O projeto utiliza **Kanban** gerenciado pelo GitHub Projects, com as colunas:
