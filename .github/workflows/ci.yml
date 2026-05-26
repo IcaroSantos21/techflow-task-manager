@@ -1,4 +1,4 @@
-name: Ci - Testes Automatizados
+name: CI - Testes Automatizados
 
 on:
   push:
@@ -8,19 +8,23 @@ on:
 
 jobs:
   testes:
-    - name: Checkout do repositorio:
-      uses: actions/checkout@v3
+    name: Executar Testes com Pytest
+    runs-on: ubuntu-latest
 
-    - name: Configurando o python 3.14
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.14
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v3
 
-    - name: instalando as dependencias
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-      
-    - name: Executando os testes
-      run: |
-        pytest tests/ -v
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Executar testes
+        run: |
+          pytest tests/ -v
