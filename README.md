@@ -1,4 +1,4 @@
-0# TechFlow Solutions — Sistema de Gerenciamento de Tarefas
+# TechFlow Solutions — Sistema de Gerenciamento de Tarefas
 
 [![CI - Testes Automatizados](https://github.com/IcaroSantos21/techflow-task-manager/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/IcaroSantos21/techflow-task-manager/actions/workflows/ci.yml)
 
