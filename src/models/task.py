@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class Tasks():
+class Task():
     def __init__(self,id: int, titulo: str, descricao: str, responsavel: str, prioridade: str = "media"):
         self.id = id
         self.titulo = titulo

@@ -1,14 +1,10 @@
-from repositories.tasks_repository import TasksRepository
+from datetime import datetime
+from src.models.task import Task
+from src.repositories.tasks_repository import TasksRepository
 
 class TasksService:
     def __init__(self, caminho="tasks.json"):
-        self.repositoy = TaskRepository(caminho)
-
-    def gerar_id(tarefas):
-        """Gera um ID único para cada tarefa."""
-        if not tarefas:
-            return 1
-        return max(tarefa['id'] for tarefa in tarefas) + 1
+        self.repository = TasksRepository(caminho)
 
     # --- CRIAR TAREFA ---
     def criar_tarefa(self, titulo, descricao, prioridade="media", responsavel=""):
@@ -24,45 +20,38 @@ class TasksService:
         if not titulo or not titulo.strip():
             raise ValueError("O titulo de tarefa não pode ser vazio.")
 
-        tarefas = self.repository.carregar_tarefas()
-        nova_tarefa = {
-            "id": self.gerar_id(tarefas),
-            "titulo": titulo.strip(),
-            "descricao": descricao.strip(),
-            "prioridade": prioridade,
-            "status": "a_fazer",
-            "responsavel": responsavel.strip(),
-            "data_criacao": datetime.now().isoformat(),
-            "data_atualizacao": datetime.now().isoformat()
-        }
-        tarefas.append(nova_tarefa)
-        salvar_tarefas(tarefas)
+        novo_id = self.repository.gerar_id()
+
+        nova_tarefa = Task(
+            id=novo_id,
+            titulo=titulo.strip(),
+            descricao=descricao.strip(),
+            prioridade=prioridade,
+            responsavel=responsavel.strip()
+        )
+        self.repository.salvar(nova_tarefa)
         return nova_tarefa
 
     # --- LER TAREFAS ---
-    def listar_tarefas(status=None, prioridade=None):
+    def listar_tarefas(self, status=None, prioridade=None):
         """
         Lista tarefas com filtros opcionais.
         status: 'a_fazer', 'em_andamento', 'concluida'
         prioridade: 'alta', 'media', 'baixa'
         """
-        tarefas = carregar_tarefas()
+        tarefas = self.repository.listar_todas()
         if status:
-            tarefas = [t for t in tarefas if t['status'] == status]
+            tarefas = [t for t in tarefas if t.status == status]
         if prioridade:
-            tarefas = [t for t in tarefas if t['prioridade'] == prioridade]
+            tarefas = [t for t in tarefas if t.prioridade == prioridade]
         return tarefas
 
-    def buscar_tarefa_por_id(tarefa_id):
+    def buscar_tarefa_por_id(self, tarefa_id):
         """Busca uma tarefa pelo ID."""
-        tarefas = carregar_tarefas()
-        for tarefa in tarefas:
-            if tarefa['id'] == tarefa_id:
-                return tarefa
-        return None
+        return self.repository.buscar_por_id(tarefa_id)
 
     # --- ATUALIZAR TAREFA ---
-    def atualizar_tarefa(id_tarefa, **campos):
+    def atualizar_tarefa(self, id_tarefa, **campos):
         """
         Atualiza os campos de uma tarefa.
         Campos permitidos: titulo, descricao, prioridade, status, responsavel
@@ -81,58 +70,66 @@ class TasksService:
         if "prioridade" in campos and campos["prioridade"] not in prioridades_validas:
             raise ValueError(f"Prioridade inválida. Use: {prioridades_validas}")
 
-        tarefas = carregar_tarefas()
-        for tarefa in tarefas:
-            if tarefa["id"] == id_tarefa:
-                for campo, valor in campos.items():
-                    tarefa[campo] = valor
-                tarefa["data_atualizacao"] = datetime.now().isoformat()
-                salvar_tarefas(tarefas)
-                return tarefa
-        return None
+        tarefa = self.repository.buscar_por_id(id_tarefa)
+        if not tarefa:
+            return None
+
+        for campo, valor in campos.items():
+            setattr(tarefa, campo, valor)
+        tarefa.data_atualizacao = datetime.now().isoformat()
+        self.repository.atualizar(tarefa)
+        return tarefa
 
     # --- DELETAR TAREFA ---
-    def deletar_tarefa(id_tarefa):
+    def deletar_tarefa(self, id_tarefa):
         """
         Remove uma tarefa pelo ID.
-        Retorna True se deletada, False se não encontrada.
         """
-        tarefas = carregar_tarefas()
-        novas_tarefas = [t for t in tarefas if t["id"] != id_tarefa]
-        if len(novas_tarefas) == len(tarefas):
-            return False  # tarefa não encontrada
-        salvar_tarefas(novas_tarefas)
-        return True
+        return self.repository.deletar(id_tarefa)
 
     # --- RELATÓRIOS DE PRODUTIVIDADE (MUDANÇA DE ESCOPO) ---
-    def gerar_relatorio_produtividade():
+    def gerar_relatorio_produtividade(self):
         """
         Gera relatório de produtividade da equipe.
         Feature adicionada após mudança de escopo solicitada pelo cliente.
         que precisava monitorar o desempenho da equipe.
         """
-        tarefas = carregar_tarefas()
+        tarefas = self.repository.listar_todas()
         total = len(tarefas)
 
         if total == 0:
-            return {"total": 0, "mensagem": "Nenhuma tarefa cadastrada."}
+            por_status = {"a_fazer": 0, "em_andamento": 0, "concluida": 0}
+            por_prioridade = {"alta": 0, "media": 0, "baixa": 0}
+            return {
+                "total": 0,
+                "a_fazer": 0,
+                "em_andamento": 0,
+                "concluida": 0,
+                "por_status": por_status,
+                "por_prioridade": por_prioridade,
+                "taxa_conclusao": 0.0,
+                "mensagem": "Nenhuma tarefa cadastrada."
+            }
 
         por_status = {
-            "a_fazer": len([t for t in tarefas if t['status'] == 'a_fazer']),
-            "em_andamento": len([t for t in tarefas if t['status'] == 'em_andamento']),
-            "concluida": len([t for t in tarefas if t['status'] == 'concluida'])
+            "a_fazer": len([t for t in tarefas if t.status == 'a_fazer']),
+            "em_andamento": len([t for t in tarefas if t.status == 'em_andamento']),
+            "concluida": len([t for t in tarefas if t.status == 'concluida'])
         }
 
         por_prioridade = {
-            "alta": len([t for t in tarefas if t['prioridade'] == 'alta']),
-            "media": len([t for t in tarefas if t['prioridade'] == 'media']),
-            "baixa": len([t for t in tarefas if t['prioridade'] == 'baixa'])
+            "alta": len([t for t in tarefas if t.prioridade == 'alta']),
+            "media": len([t for t in tarefas if t.prioridade == 'media']),
+            "baixa": len([t for t in tarefas if t.prioridade == 'baixa'])
         }
 
         taxa_conclusao = round((por_status['concluida'] / total) * 100, 1)
 
         return {
             "total": total,
+            "a_fazer": por_status["a_fazer"],
+            "em_andamento": por_status["em_andamento"],
+            "concluida": por_status["concluida"],
             "por_status": por_status,
             "por_prioridade": por_prioridade,
             "taxa_conclusao": taxa_conclusao
