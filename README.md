@@ -98,3 +98,5 @@ pytest tests/ -v
 
 Desenvolvido por: Ícaro Santos  
 Disciplina: Engenharia de Software — UniFECAF
+## Kanban
+Quadro Kanban disponível na aba Projects do repositório.
